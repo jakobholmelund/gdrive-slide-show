@@ -3,41 +3,110 @@
 <head>
     <title>Slideshow</title>
     <style>
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+
         #slideshow {
-            max-width: 500px;
-            height: 300px;
-            margin: 0 auto;
-        }
-        #slideshow img {
-            width: 100%;
-            height: auto;
-        }
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#slideshow img {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 100%;
+    width: 100%;
+    min-height: 100%;
+    min-width: 100%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    transition: opacity 1s;
+    opacity: 0;
+}
+
+#slideshow img.show {
+    opacity: 1;
+}
+
+        
     </style>
+    
 </head>
 <body>
     <div id="slideshow"></div>
     
     <script>
-        var slideshowDiv = document.getElementById('slideshow');
-var index = 0;
-var fileIds = [];
 
-fetch('https://script.google.com/macros/s/your-script-id/exec')
-    .then(response => response.json())
-    .then(data => {
-        fileIds = data;
-        setInterval(nextSlide, 3000); // Change slide every 3 seconds
-    });
+
+var slideshowDiv = document.getElementById('slideshow');
+var index = 0;
+var fileUrls = [];
+var currentUrl = null;
+
+// Fetch the list of image URLs from your Apps Script web app
+fetchImages();
+
+// Fetch images every 10 minutes
+setInterval(fetchImages, 10 * 60 * 1000);
+
+function fetchImages() {
+    if (fileUrls.length > 0) {
+        currentUrl = fileUrls[index];
+    }
+    
+    fetch('https://script.google.com/macros/s/AKfycbzhUGteNZbZFkddrp5abAAVA80HVFvKna0jnqtJzFoD3zxMgcN1CNFsKZOwBBwzC4muWA/exec')
+        .then(response => response.json())
+        .then(data => {
+            fileUrls = data;
+
+            // After updating the image list, find the index of the current image
+            index = fileUrls.indexOf(currentUrl);
+            if (index === -1) { // If the current image was not found (it might have been deleted), start from the beginning
+                index = 0;
+            }
+
+            // If there's no slideshow running yet, start it
+            if (!currentUrl) {
+                nextSlide();
+                setInterval(nextSlide, 60000);
+            }
+        });
+}
 
 function nextSlide() {
-    if (fileIds.length > 0) {
-        var img = document.createElement('img');
-        img.src = 'https://script.google.com/macros/s/your-script-id/exec?id=' + fileIds[index];
-        slideshowDiv.innerHTML = '';
-        slideshowDiv.appendChild(img);
-        index = (index + 1) % fileIds.length;
+    if (fileUrls.length > 0) {
+        var img;
+        // If an image for this index does not exist, create it
+        if (slideshowDiv.children[index]) {
+            img = slideshowDiv.children[index];
+        } else {
+            img = document.createElement('img');
+            img.src = fileUrls[index];
+            slideshowDiv.appendChild(img);
+        }
+        // Hide all images
+        Array.from(slideshowDiv.children).forEach(img => img.classList.remove('show'));
+        // Show the current image
+        img.classList.add('show');
+
+        // Preload the next image
+        var nextImage = new Image();
+        nextImage.src = fileUrls[(index + 1) % fileUrls.length];
+
+        index = (index + 1) % fileUrls.length;
     }
 }
+
+nextSlide();
+
+
     </script>
 </body>
 </html>
