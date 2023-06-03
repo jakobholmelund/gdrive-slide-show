@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Slideshow</title>
+    <style>
+        #slideshow {
+            max-width: 500px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        #slideshow img {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="slideshow"></div>
+    
+    <script>
+        var slideshowDiv = document.getElementById('slideshow');
+        var index = 0;
+        var imageUrls = [];
+
+        fetch('https://script.google.com/macros/s/your-script-id/exec')
+            .then(response => response.json())
+            .then(data => {
+                imageUrls = data;
+                setInterval(nextSlide, 2000); // Change slide every 2 seconds
+            });
+
+        function nextSlide() {
+            if (imageUrls.length > 0) {
+                var img = document.createElement('img');
+                img.src = imageUrls[index];
+                slideshowDiv.innerHTML = '';
+                slideshowDiv.appendChild(img);
+                index = (index + 1) % imageUrls.length;
+            }
+        }
+    </script>
+</body>
+</html>
