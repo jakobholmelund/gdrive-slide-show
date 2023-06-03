@@ -19,25 +19,25 @@
     
     <script>
         var slideshowDiv = document.getElementById('slideshow');
-        var index = 0;
-        var imageUrls = [];
+var index = 0;
+var fileIds = [];
 
-        fetch('https://script.google.com/macros/s/AKfycbyBGkr7xZGx_kHfOMjX5nLwO1Gole8XHY0KKZsd28yodD6bZpATYh_6SJljYsZ1o2RCBw/exec')
-            .then(response => response.json())
-            .then(data => {
-                imageUrls = data;
-                setInterval(nextSlide, 2000); // Change slide every 2 seconds
-            });
+fetch('https://script.google.com/macros/s/your-script-id/exec')
+    .then(response => response.json())
+    .then(data => {
+        fileIds = data;
+        setInterval(nextSlide, 3000); // Change slide every 3 seconds
+    });
 
-        function nextSlide() {
-            if (imageUrls.length > 0) {
-                var img = document.createElement('img');
-                img.src = imageUrls[index];
-                slideshowDiv.innerHTML = '';
-                slideshowDiv.appendChild(img);
-                index = (index + 1) % imageUrls.length;
-            }
-        }
+function nextSlide() {
+    if (fileIds.length > 0) {
+        var img = document.createElement('img');
+        img.src = 'https://script.google.com/macros/s/your-script-id/exec?id=' + fileIds[index];
+        slideshowDiv.innerHTML = '';
+        slideshowDiv.appendChild(img);
+        index = (index + 1) % fileIds.length;
+    }
+}
     </script>
 </body>
 </html>
