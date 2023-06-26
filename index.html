@@ -64,23 +64,26 @@ function fetchImages() {
     fetch('https://script.google.com/macros/s/AKfycbzhUGteNZbZFkddrp5abAAVA80HVFvKna0jnqtJzFoD3zxMgcN1CNFsKZOwBBwzC4muWA/exec?time=' + new Date().getTime())
         .then(response => response.json())
         .then(data => {
-            fileUrls = data;
-
-            // After updating the image list, find the index of the current image
-            index = fileUrls.indexOf(currentUrl);
-            if (index === -1) { // If the current image was not found (it might have been deleted), start from the beginning
-                index = 0;
-            }
+            newFileUrls = data;  // Update newFileUrls instead of fileUrls
 
             // If there's no slideshow running yet, start it
             if (!currentUrl) {
                 nextSlide();
-                setInterval(nextSlide, 5000);
+                setInterval(nextSlide, 3000);
             }
         });
 }
 
 function nextSlide() {
+    // If newFileUrls is not empty, update fileUrls and index
+    if (newFileUrls.length > 0) {
+        fileUrls = newFileUrls;
+        index = fileUrls.indexOf(currentUrl);
+        if (index === -1) {
+            index = 0;
+        }
+    }
+    
     if (fileUrls.length > 0) {
         var img;
         // If an image for this index does not exist, create it
