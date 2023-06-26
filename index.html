@@ -43,20 +43,21 @@ body, html {
     <div id="slideshow"></div>
     
     <script>
-
-
-var slideshowDiv = document.getElementById('slideshow');
+var slideshowDiv = null;
 var index = 0;
 var fileUrls = [];
 var currentUrl = null;
 let newFileUrls = [];  // A new array to hold the updated list of file URLs
 
+window.onload = function() {
+  slideshowDiv = document.getElementById('slideshow');
 
-// Fetch the list of image URLs from your Apps Script web app
-fetchImages();
+  // Fetch the list of image URLs from your Apps Script web app
+  fetchImages();
 
-// Fetch images every 10 minutes
-setInterval(fetchImages, 2 * 60 * 1000);
+  // Fetch images every 10 minutes
+  setInterval(fetchImages, 2 * 60 * 1000);
+}
 
 function fetchImages() {
     if (fileUrls.length > 0) {
@@ -108,8 +109,6 @@ function nextSlide() {
         index = (index + 1) % fileUrls.length;
     }
 }
-
-nextSlide();
 
 
     </script>
