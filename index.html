@@ -44,6 +44,7 @@ body, html {
     
     <script>
 var slideshowDiv = null;
+var slideIndex = 0;
 var index = 0;
 var fileUrls = [];
 var currentUrl = null;
@@ -61,7 +62,7 @@ window.onload = function() {
 
 function fetchImages() {
     if (fileUrls.length > 0) {
-        currentUrl = fileUrls[index];
+        currentUrl = fileUrls[slideIndex];
     }
     
     fetch('https://script.google.com/macros/s/AKfycbzhUGteNZbZFkddrp5abAAVA80HVFvKna0jnqtJzFoD3zxMgcN1CNFsKZOwBBwzC4muWA/exec?time=' + new Date().getTime())
@@ -81,20 +82,20 @@ function nextSlide() {
     // If newFileUrls is not empty, update fileUrls and index
     if (newFileUrls.length > 0) {
         fileUrls = newFileUrls;
-        index = fileUrls.indexOf(currentUrl);
-        if (index === -1) {
-            index = 0;
+        slideIndex = fileUrls.indexOf(currentUrl);
+        if (slideIndex === -1) {
+            slideIndex = 0;
         }
     }
     
     if (fileUrls.length > 0) {
         var img;
         // If an image for this index does not exist, create it
-        if (slideshowDiv.children[index]) {
-            img = slideshowDiv.children[index];
+        if (slideshowDiv.children[slideIndex]) {
+            img = slideshowDiv.children[slideIndex];
         } else {
             img = document.createElement('img');
-            img.src = fileUrls[index];
+            img.src = fileUrls[slideIndex];
             slideshowDiv.appendChild(img);
         }
         // Hide all images
@@ -104,12 +105,11 @@ function nextSlide() {
 
         // Preload the next image
         var nextImage = new Image();
-        nextImage.src = fileUrls[(index + 1) % fileUrls.length];
+        nextImage.src = fileUrls[(slideIndex + 1) % fileUrls.length];
 
-        index = (index + 1) % fileUrls.length;
+        slideIndex = (slideIndex + 1) % fileUrls.length;
     }
 }
-
 
     </script>
 </body>
