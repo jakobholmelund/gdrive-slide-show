@@ -43,71 +43,54 @@ body, html {
     <div id="slideshow"></div>
     
     <script>
-var slideshowDiv = null;
-var slideIndex = 0;
+var slideshowDiv = document.getElementById('slideshow');
 var index = 0;
-var fileUrls = [];
-var currentUrl = null;
-let newFileUrls = [];  // A new array to hold the updated list of file URLs
+var imgElements = [];
 
-window.onload = function() {
-  slideshowDiv = document.getElementById('slideshow');
+// Fetch the list of image URLs from your Apps Script web app
+fetchImages();
 
-  // Fetch the list of image URLs from your Apps Script web app
-  fetchImages();
+// Fetch images every 10 minutes
+setInterval(fetchImages, 10 * 60 * 1000);
 
-  // Fetch images every 10 minutes
-  setInterval(fetchImages, 2 * 60 * 1000);
-}
+// Start the slideshow
+setInterval(nextSlide, 3000);
 
 function fetchImages() {
-    if (fileUrls.length > 0) {
-        currentUrl = fileUrls[slideIndex];
-    }
-    
     fetch('https://script.google.com/macros/s/AKfycbzhUGteNZbZFkddrp5abAAVA80HVFvKna0jnqtJzFoD3zxMgcN1CNFsKZOwBBwzC4muWA/exec?time=' + new Date().getTime())
         .then(response => response.json())
         .then(data => {
-            newFileUrls = data;  // Update newFileUrls instead of fileUrls
+            // Update imgElements based on the fetched URLs
+            data.forEach((url, i) => {
+                if (imgElements[i]) {
+                    // Update the src of an existing image element
+                    imgElements[i].src = url;
+                } else {
+                    // Create a new image element for a new URL
+                    var img = document.createElement('img');
+                    img.src = url;
+                    slideshowDiv.appendChild(img);
+                    imgElements.push(img);
+                }
+            });
 
-            // If there's no slideshow running yet, start it
-            if (!currentUrl) {
-                nextSlide();
-                setInterval(nextSlide, 3000);
+            // Remove extra image elements if any URLs were deleted
+            while (imgElements.length > data.length) {
+                imgElements.pop().remove();
             }
         });
 }
 
 function nextSlide() {
-    // If newFileUrls is not empty, update fileUrls and index
-    if (newFileUrls.length > 0) {
-        fileUrls = newFileUrls;
-        slideIndex = fileUrls.indexOf(currentUrl);
-        if (slideIndex === -1) {
-            slideIndex = 0;
-        }
-    }
-    
-    if (fileUrls.length > 0) {
-        var img;
-        // If an image for this index does not exist, create it
-        if (slideshowDiv.children[slideIndex]) {
-            img = slideshowDiv.children[slideIndex];
-        } else {
-            img = document.createElement('img');
-            img.src = fileUrls[slideIndex];
-            slideshowDiv.appendChild(img);
-        }
+    if (imgElements.length > 0) {
         // Hide all images
-        Array.from(slideshowDiv.children).forEach(img => img.classList.remove('show'));
+        imgElements.forEach(img => img.style.display = 'none');
+        
         // Show the current image
-        img.classList.add('show');
-
-        // Preload the next image
-        var nextImage = new Image();
-        nextImage.src = fileUrls[(slideIndex + 1) % fileUrls.length];
-
-        slideIndex = (slideIndex + 1) % fileUrls.length;
+        imgElements[index].style.display = 'block';
+        
+        // Move to the next index
+        index = (index + 1) % imgElements.length;
     }
 }
 
