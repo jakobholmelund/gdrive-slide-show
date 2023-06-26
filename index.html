@@ -69,6 +69,7 @@ function fetchImages() {
                     // Create a new image element for a new URL
                     var img = document.createElement('img');
                     img.src = url;
+                    img.style.display = 'none';  // Set the initial display state to 'none'
                     slideshowDiv.appendChild(img);
                     imgElements.push(img);
                 }
@@ -77,6 +78,11 @@ function fetchImages() {
             // Remove extra image elements if any URLs were deleted
             while (imgElements.length > data.length) {
                 imgElements.pop().remove();
+            }
+
+            // Make sure at least one image is visible
+            if (imgElements.length > 0 && imgElements[index].style.display === 'none') {
+                imgElements[index].style.display = 'block';
             }
         });
 }
@@ -93,6 +99,7 @@ function nextSlide() {
         index = (index + 1) % imgElements.length;
     }
 }
+
 
     </script>
 </body>
