@@ -61,7 +61,7 @@ function fetchImages() {
         currentUrl = fileUrls[index];
     }
     
-    fetch('https://script.google.com/macros/s/AKfycbzhUGteNZbZFkddrp5abAAVA80HVFvKna0jnqtJzFoD3zxMgcN1CNFsKZOwBBwzC4muWA/exec')
+    fetch('https://script.google.com/macros/s/AKfycbzhUGteNZbZFkddrp5abAAVA80HVFvKna0jnqtJzFoD3zxMgcN1CNFsKZOwBBwzC4muWA/exec?time=' + new Date().getTime())
         .then(response => response.json())
         .then(data => {
             fileUrls = data;
