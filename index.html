@@ -49,6 +49,8 @@ var slideshowDiv = document.getElementById('slideshow');
 var index = 0;
 var fileUrls = [];
 var currentUrl = null;
+let newFileUrls = [];  // A new array to hold the updated list of file URLs
+
 
 // Fetch the list of image URLs from your Apps Script web app
 fetchImages();
