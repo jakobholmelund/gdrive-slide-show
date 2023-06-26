@@ -54,7 +54,7 @@ var currentUrl = null;
 fetchImages();
 
 // Fetch images every 10 minutes
-setInterval(fetchImages, 2 * 60 * 1000);
+setInterval(fetchImages, 0.5 * 60 * 1000);
 
 function fetchImages() {
     if (fileUrls.length > 0) {
