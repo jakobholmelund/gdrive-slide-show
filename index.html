@@ -59,7 +59,7 @@ function fetchImages() {
             if (!currentUrl && fileUrls.length > 0) {
                 currentUrl = fileUrls[0];
                 nextSlide();
-                setInterval(nextSlide, 3000);
+                setInterval(nextSlide, 0.5 * 60 * 1000);
             }
         });
 }
