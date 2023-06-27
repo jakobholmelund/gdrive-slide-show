@@ -64,7 +64,7 @@ function fetchImages() {
             // If there's no slideshow running yet, start it
             if (currentUrl === null) {
                 nextSlide();
-                setInterval(nextSlide, 3000);
+                setInterval(nextSlide, 0.5 * 60 * 1000);
             }
         });
 }
