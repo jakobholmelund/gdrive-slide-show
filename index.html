@@ -41,61 +41,30 @@
     <script>
 var slideshowDiv = document.getElementById('slideshow');
 var index = 0;
-var imgElements = [];
 var fileUrls = [];
 var currentUrl = null;
-let newFileUrls = []; 
+let newFileUrls = [];  // A new array to hold the updated list of file URLs
 
 // Fetch the list of image URLs from your Apps Script web app
 fetchImages();
 
 // Fetch images every 10 minutes
-setInterval(fetchImages, 10 * 60 * 1000);
-
-// Start the slideshow
-setInterval(nextSlide, 3000);
+setInterval(fetchImages, 2 * 60 * 1000);
 
 function fetchImages() {
     fetch('https://script.google.com/macros/s/AKfycbzhUGteNZbZFkddrp5abAAVA80HVFvKna0jnqtJzFoD3zxMgcN1CNFsKZOwBBwzC4muWA/exec?time=' + new Date().getTime())
         .then(response => response.json())
         .then(data => {
-            // Start preloading all images
-            let loadingImages = data.map((url, i) => {
-                return new Promise((resolve, reject) => {
-                    let img = new Image();
-                    img.onload = () => resolve({url: url, element: img, index: i});
-                    img.onerror = reject;
-                    img.src = url;
-                });
-            });
+            newFileUrls = data;  // Update newFileUrls instead of fileUrls
 
-            // After all images are loaded, update imgElements
-            Promise.all(loadingImages).then(images => {
-                images.sort((a, b) => a.index - b.index).forEach((img, i) => {
-                    if (imgElements[i]) {
-                        // Update the src of an existing image element
-                        imgElements[i].src = img.url;
-                    } else {
-                        // Create a new image element for a new URL
-                        img.element.style.display = 'none';  // Set the initial display state to 'none'
-                        slideshowDiv.appendChild(img.element);
-                        imgElements.push(img.element);
-                    }
-                });
-
-                // Remove extra image elements if any URLs were deleted
-                while (imgElements.length > data.length) {
-                    imgElements.pop().remove();
-                }
-
-                // Make sure at least one image is visible
-                if (imgElements.length > 0 && imgElements[index].style.display === 'none') {
-                    imgElements[index].style.display = 'block';
-                }
-            }).catch(console.error);
+            // If there's no slideshow running yet, start it
+            if (!currentUrl && newFileUrls.length > 0) {
+                currentUrl = newFileUrls[0]; // set the first url
+                nextSlide();
+                setInterval(nextSlide, 3000);
+            }
         });
 }
-
 
 function nextSlide() {
     // If newFileUrls is not empty, update fileUrls and index
@@ -127,10 +96,10 @@ function nextSlide() {
         var nextImage = new Image();
         nextImage.src = fileUrls[(index + 1) % fileUrls.length];
 
+        currentUrl = fileUrls[index];
         index = (index + 1) % fileUrls.length;
     }
 }
-
 
 
     </script>
