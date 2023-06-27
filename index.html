@@ -30,10 +30,9 @@
 <div id="slideshow"></div>
 <script>
 var slideshowDiv = document.getElementById('slideshow');
-var index = 0;
 var fileUrls = [];
+var images = {};
 var currentUrl = null;
-let newFileUrls = [];  // A new array to hold the updated list of file URLs
 
 // Fetch the list of image URLs from your Apps Script web app
 fetchImages();
@@ -45,11 +44,20 @@ function fetchImages() {
     fetch('https://script.google.com/macros/s/AKfycbzhUGteNZbZFkddrp5abAAVA80HVFvKna0jnqtJzFoD3zxMgcN1CNFsKZOwBBwzC4muWA/exec?time=' + new Date().getTime())
         .then(response => response.json())
         .then(data => {
-            newFileUrls = data;  // Update newFileUrls instead of fileUrls
-
+            data.forEach(url => {
+                // If this URL is not in fileUrls, add it
+                if (!fileUrls.includes(url)) {
+                    fileUrls.push(url);
+                    // Create an img element for this URL
+                    let img = document.createElement('img');
+                    img.src = url;
+                    slideshowDiv.appendChild(img);
+                    images[url] = img;
+                }
+            });
             // If there's no slideshow running yet, start it
-            if (!currentUrl && newFileUrls.length > 0) {
-                currentUrl = newFileUrls[0]; // set the first url
+            if (!currentUrl && fileUrls.length > 0) {
+                currentUrl = fileUrls[0];
                 nextSlide();
                 setInterval(nextSlide, 3000);
             }
@@ -57,37 +65,14 @@ function fetchImages() {
 }
 
 function nextSlide() {
-    // If newFileUrls is not empty, update fileUrls and index
-    if (newFileUrls.length > 0) {
-        fileUrls = newFileUrls;
-        index = fileUrls.indexOf(currentUrl);
-        if (index === -1 || index >= fileUrls.length) {
-            index = 0;
-        }
-    }
-
     if (fileUrls.length > 0) {
-        let img;
-        // If an image for this index does not exist, create it
-        if (slideshowDiv.children[index]) {
-            img = slideshowDiv.children[index];
-        } else {
-            img = document.createElement('img');
-            img.src = fileUrls[index];
-            slideshowDiv.appendChild(img);
+        // Hide the current image
+        if (currentUrl) {
+            images[currentUrl].style.opacity = 0;
         }
-
-        // Hide all images
-        Array.from(slideshowDiv.children).forEach(img => img.style.opacity = 0);
-        // Show the current image
-        img.style.opacity = 1;
-
-        // Preload the next image
-        var nextImage = new Image();
-        nextImage.src = fileUrls[(index + 1) % fileUrls.length];
-
-        currentUrl = fileUrls[index];
-        index = (index + 1) % fileUrls.length;
+        // Show the next image
+        currentUrl = fileUrls[(fileUrls.indexOf(currentUrl) + 1) % fileUrls.length];
+        images[currentUrl].style.opacity = 1;
     }
 }
 </script>
