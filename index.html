@@ -40,6 +40,8 @@ fetchImages();
 // Fetch images every 10 minutes
 setInterval(fetchImages, 2 * 60 * 1000);
 
+var firstNewIndex = null;
+
 function fetchImages() {
     fetch('https://script.google.com/macros/s/AKfycbzhUGteNZbZFkddrp5abAAVA80HVFvKna0jnqtJzFoD3zxMgcN1CNFsKZOwBBwzC4muWA/exec?time=' + new Date().getTime())
         .then(response => response.json())
@@ -47,6 +49,10 @@ function fetchImages() {
             data.forEach(url => {
                 // If this URL is not in fileUrls, add it
                 if (!fileUrls.includes(url)) {
+                    // If this is the first new image, remember its index
+                    if (firstNewIndex === null) {
+                        firstNewIndex = fileUrls.length;
+                    }
                     fileUrls.push(url);
                     // Create an img element for this URL
                     let img = document.createElement('img');
@@ -56,15 +62,19 @@ function fetchImages() {
                 }
             });
             // If there's no slideshow running yet, start it
-            if (!currentUrl && fileUrls.length > 0) {
-                currentUrl = fileUrls[0];
+            if (currentUrl === null) {
                 nextSlide();
-                setInterval(nextSlide, 0.5 * 60 * 1000);
+                setInterval(nextSlide, 3000);
             }
         });
 }
 
 function nextSlide() {
+    // If we have a new first image, jump to it and reset firstNewIndex
+    if (firstNewIndex !== null) {
+        index = firstNewIndex;
+        firstNewIndex = null;
+    }
     if (fileUrls.length > 0) {
         // Hide the current image
         if (currentUrl) {
